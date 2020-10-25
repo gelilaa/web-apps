@@ -1,8 +1,10 @@
 // require dependencies
-_;
+const { log } = require('console');
+const fs = require('fs');
+const { join } = require('path');
 
 // declare constants
-const ENTRIES_PATH = _;
+const ENTRIES_PATH = './entries.json';
 const DOC_STRING = `
 COMMANDS:
 
@@ -30,7 +32,7 @@ FLAGS:
 
 // step 0: log the docs for
 if (process.argv.includes('-h')) {
-  console.log(_);
+  console.log(DOC_STRING);
   // this line tells Node to stop right now, done, end, finished.
   //  it's kind of like an early return, but for a node app
   process.exit(0);
@@ -41,81 +43,82 @@ const entriesManager = (entries, command, key, value) => {
 
   // step 5: make sure command is defined
   //  alert the user and exit early if it is not
-  if (_) {
+  if (command === undefined) {
     console.log(`a command is required  \nSee "node file.js -h"`);
-    _;
+    process.exit(0);
   }
 
   // step 6: make sure the first argument is one of the 4 supported commands
   //  alert the user and exit early if it is not
-  if (_) {
+  if (command !=='all' && command !=='write' &&  command !=='read' && command !=='delete') {
     console.log(`${command} is not a valid command  \nSee "node file.js -h"`);
-    _;
+   process.exit(0);
   }
 
   // step 7: log all entries if the user passed the 'all' command
   //  this command does not require any other user arguments
   //  exit early since there are no changes to save
-  if (_) {
-    _;
-    _;
+  if (command === 'all') {
+   console.log(entries);
+    process.exit(0);
   }
 
   // step 8: all remaining commands require at least a key
   //  alert the user and exit early if there is no key
   if (key === undefined) {
     console.log(`a key is required, cannot ${command}  \nSee "node file.js -h"`);
-    _;
+    process.exit(0);
   }
 
   // step 9: conditionally execute the logic for the remaining commands
-  if (_) {
+  if ('read'== command) {
     // step 9 a.1: make sure the key exists before trying to read it
     //  alert the user and exit early if it does not
-    if (_) {
+    if (command ===!entries[key]) {
       console.log(`key "${key}" does not exist. cannot read`);
-      _;
+      process.exit(0);
     }
 
     // step 9 a.2: print the requested entry
     //  exit early, there are no changes to save
-    console.log(`${key}: ${entries[key]}`);
-    _;
+    console.log(`${key}:${entries[key]}`);
+    process.exit(0);
 
-  } else if (_) {
+  } else if (command ==='delete') {
     // step 9 b.1: make sure the key exists before trying to delete it
     //  alert the user and exit early if it does not
-    if (_) {
+    if (command ===!entries[key]) {
       console.log(`key "${key}" does not exist. cannot delete`);
-      _;
+      process.exit(0);
     }
 
     // step 9 b.2: delete the correct entry
     //  do not exit early!  this change needs to be saved to the file system
-    _;
+    delete entries[key];
+    //console.log(`your changes were saved \n(${command}) ${key}`);
 
-  } else if (_) {
+  } else if (command === 'write') {
     // step 9 c.1: make sure the value is defined
     //  alert the user and exit early if they did not
-    if (_) {
+    if (value === undefined) {
       console.log(`no value provided.  cannot write "${key}"`);
-      _;
+      ;
     }
 
     // step 9 c.2:  write the key/value pair in entries
     //  do not exit early!  this change needs to be saved to the file system
-    _;
+    entries[key] = value;
   }
 
 
   // step 10: convert the new entries object to a string
-  const newEntriesString = _;
+  const newEntriesString = JSON.stringify(entries,null,' ');
 
   // step 11: declare writeFileCallback
   const writeFileCallback = (err) => {
     // step 13: let the user know if their changes were successfully saved
-    if (_) {
-      _
+    if (err) {
+      console.error(err)
     }
 
     console.log('your changes were saved');
@@ -123,20 +126,21 @@ const entriesManager = (entries, command, key, value) => {
   };
 
   // step 12: save changes to the file system
-  _;
+  fs.log;
 
 };
 
 // step 2: declare callback that uses main app function
 const readFileCb = (err, entriesString) => {
   // step 4: handle file system error, or execute main app function
-  if (_) {
-    _
+  if (err) {
+    console.log(err)
+    return;
   }
 
-  const parsedEntries = _;
-  _(_, _, _, _);
+  const parsedEntries = JSON.parse(entriesString);
+  entriesManager(parsedEntries,process.argv[2],process.argv[3], process.argv[2]);
 };
 
 // step 3: read the stored data and execute the callback
-_;
+fs.readFile(ENTRIES_PATH,'utf-8',readFileCb);

@@ -1,3 +1,4 @@
 module.exports = {
-  MODE: 'development'
+  MODE: 'development',
+  FILES_DIR: '/files-dev'
 };

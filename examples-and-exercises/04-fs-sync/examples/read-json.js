@@ -7,7 +7,7 @@ const fs = require('fs');
 
 // declare constants
 const START = Date.now();
-
+console.log(process.argv);
 // declare logging function
 const log = (logId, value) => console.log(
   `\nlog ${logId}, ${Date.now() - START} ms: ${typeof value}\n`,
