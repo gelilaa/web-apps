@@ -7,7 +7,7 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const config = require('./config');
-const { static } = require('express');
+
 
 // - setup -
 const FILES_DIR = __dirname + '/text-files';
@@ -19,7 +19,7 @@ const app = express();
 app.use(cors());
 // parse the body
 app.use(bodyParser.json());
-app.use(static.express('public'))
+app.use(express.static('public'));
 
 // https://github.com/expressjs/morgan#write-logs-to-a-file
 const accessLogStream = fs.createWriteStream(
@@ -43,7 +43,7 @@ app.use('/', express.static(path.join(__dirname, 'client')));;
 // read all file names
 //  called in init.js
 //  redirected to by other routes
-app.get('api/files', (req, res, next) => {
+app.get('/files', (req, res, next) => {
   fs.readdir(FILES_DIR, (err, list) => {
     if (err && err.code === 'ENOENT') {
       res.status(404).end();
@@ -61,7 +61,7 @@ app.get('api/files', (req, res, next) => {
 
 // read a file
 //  called by action: fetchAndLoadFile
-app.get('/api/files/:name', (req, res, next) => {
+app.get('/files/:name', (req, res, next) => {
   const fileName = req.params.name;
   fs.readFile(`${FILES_DIR}/${fileName}`, 'utf-8', (err, fileText) => {
     if (err && err.code === 'ENOENT') {
@@ -83,7 +83,7 @@ app.get('/api/files/:name', (req, res, next) => {
 
 // write a file
 //  called by action: saveFile
-app.post('/api/files', (req, res, next) => {
+app.post('/files/:name', (req, res, next) => {
   const fileName = req.params.name; // read from params
   const fileText = req.body.text; // read from body
   fs.writeFile(`${FILES_DIR}/${fileName}`,fileText,err => {
@@ -104,7 +104,7 @@ app.post('/api/files', (req, res, next) => {
 
 // delete a file
 //  called by action: deleteFile
-app.delete('api/files', (req, res, next) => {
+app.delete('/files/:name', (req, res, next) => {
   const fileName = req.params.name; // read from params
   fs.unlink(`${FILES_DIR}/${fileName}`, err => {
     if (err && err.code === 'ENOENT') {

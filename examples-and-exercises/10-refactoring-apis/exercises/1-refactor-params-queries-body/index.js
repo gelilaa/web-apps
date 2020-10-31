@@ -11,6 +11,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const cors = require('cors');
+const api = require('./api/routes')
 
 const config = require('./config');
 
@@ -31,9 +32,10 @@ app.use(morgan('dev'));
 
 app.use('/', express.static(path.join(__dirname, 'client')));
 
-app.get('/api', (req, res) => {
-  res.send('api!');
-});
+app.use('/api',api);
+// app.get('/api', (req, res) => {
+//   res.send('api!');
+// });
 
 app.post('/api/param/:value', (req, res) => {
   const paramValue = req.params.value;
